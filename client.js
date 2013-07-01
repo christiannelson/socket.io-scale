@@ -3,7 +3,7 @@
  * receives and emits the 'msg' event
  */
 
-var NODE_MODULES_PATH = '/usr/local/lib/node_modules/';
+var NODE_MODULES_PATH = '../node_modules/';
 var PORT = 8090;
 var HOST = 'http://localhost';
 
@@ -12,15 +12,19 @@ var port = process.argv[2] || PORT;
 console.log('client connects to port ' + port);
 
 var io = require(NODE_MODULES_PATH + 'socket.io-client');
-var socket = io.connect(HOST + ':' + PORT);
+var socket = io.connect(HOST + ':' + port);
 
 socket.on('connect', function () {
 
-    // send message to server
-    socket.emit('msg', {'foo': 'bar'});
+    process.stdin.resume();
+	process.stdin.setEncoding('utf8');
+ 
+    process.stdin.on('data', function (chunk) {
+        socket.emit('msg', chunk);
+    });
 
     // wait for messages
     socket.on('msg', function(data) {
-        console.log('new message received');
+        console.log('msg: ' + data);
     });
 });
